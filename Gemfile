@@ -9,6 +9,7 @@ gem 'bcrypt', '~> 3.1.7'
 gem 'active_model_serializers'
 
 group :development, :test do
+  gem 'rack-cors', :require => 'rack/cors'
   gem 'mocha'
   gem 'guard'
   gem 'guard-minitest'

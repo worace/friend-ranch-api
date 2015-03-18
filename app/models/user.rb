@@ -3,6 +3,7 @@ require "securerandom"
 class User < ActiveRecord::Base
   has_secure_password
   before_create :generate_auth_token
+  validates :name, :email, :password, :password_confirmation, presence: true
 
   def generate_auth_token
     token = SecureRandom.uuid

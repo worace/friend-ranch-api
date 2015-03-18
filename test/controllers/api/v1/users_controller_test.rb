@@ -12,12 +12,51 @@ describe Api::V1::UsersController do
     assert_equal "token", u.token
   end
 
+  it "returns current user by token on GET :me" do
+    u = User.create!(user_params)
+    login(u)
+    get :me
+    assert_equal hwia(UserSerializer.new(u).as_json), resp_data
+  end
+
   it "returns validation errors if user is invalid (eg pw doesnt match)" do
     params = hwia({email: "test@example.com", password: "asdgasg", password_confirmation: "pizza", name: "worace"})
     post :create, user: params
     assert_response 406
     assert_equal resp_data["status"], "error"
     assert resp_data["errors"].keys.include?("password_confirmation")
+  end
+
+  it 'requires pw confirmation' do
+    params = hwia({email: "test@example.com", password: "asdgasg", password_confirmation: nil, name: "worace"})
+    post :create, user: params
+    assert_response 406
+    assert_equal resp_data["status"], "error"
+    assert resp_data["errors"].keys.include?("password_confirmation")
+  end
+
+  it 'requires pw' do
+    params = hwia({email: "test@example.com", password: nil, password_confirmation: "pizza", name: "worace"})
+    post :create, user: params
+    assert_response 406
+    assert_equal resp_data["status"], "error"
+    assert resp_data["errors"].keys.include?("password")
+  end
+
+  it 'requires name' do
+    params = hwia({email: "test@example.com", password: "pizza", password_confirmation: "pizza", name: nil})
+    post :create, user: params
+    assert_response 406
+    assert_equal resp_data["status"], "error"
+    assert resp_data["errors"].keys.include?("name")
+  end
+
+  it 'requires email' do
+    params = hwia({email: nil, password: "pizza", password_confirmation: "pizza", name: "worace"})
+    post :create, user: params
+    assert_response 406
+    assert_equal resp_data["status"], "error"
+    assert resp_data["errors"].keys.include?("email")
   end
 
   it "finds a user via token on show" do

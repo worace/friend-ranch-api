@@ -1,5 +1,6 @@
 class Api::V1::UsersController < Api::V1::BaseController
   before_filter :require_matching_auth_token, only: [:show]
+  protect_from_forgery :except => :create
 
   def create
     u = User.new(user_params)
@@ -7,6 +8,14 @@ class Api::V1::UsersController < Api::V1::BaseController
       render json: u
     else
       render json: {status: "error", errors: u.errors}.to_json, status: 406
+    end
+  end
+
+  def me
+    if current_user
+      render json: current_user
+    else
+      render json: {"error" => "not logged in"}, status: 401
     end
   end
 
