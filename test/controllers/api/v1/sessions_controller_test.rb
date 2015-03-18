@@ -22,4 +22,16 @@ class Api::V1::SessionsControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_equal token, u.reload.token
   end
+
+  it "prevents regenerating another user's auth token" do
+    u1 = User.create(user_params)
+    u2 = User.create(user_params)
+    login(u2)
+    t1 = u1.token
+    t2 = u2.token
+    delete :destroy, id: u1.id
+    assert_response :success
+    assert_equal t1, u1.reload.token
+    assert_not_equal t2, u2.reload.token
+  end
 end
