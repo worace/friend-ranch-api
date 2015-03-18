@@ -22,7 +22,7 @@ describe Api::V1::UsersController do
 
   it "finds a user via token on show" do
     u = User.create!(user_params)
-    request.env[Api::V1::BaseController::TOKEN_HEADER] = u.token
+    login(u)
     get :show, {id: u.id}
     assert_response :success
     assert_equal u.email, resp_data["user"]["email"]
@@ -38,16 +38,8 @@ describe Api::V1::UsersController do
   it "won't auth user with non-matching token" do
     u = User.create!(user_params)
     u2 = User.create!(user_params)
-    @request.env[Api::V1::BaseController::TOKEN_HEADER] = u2.token
+    login(u2)
     get :show, id: u.id
     assert_response :unauthorized
   end
-end
-
-def user_params
-  hwia({email: "test@example.com", password: "pizza", password_confirmation: "pizza", name: "worace"})
-end
-
-def resp_data
-  JSON.parse(response.body)
 end

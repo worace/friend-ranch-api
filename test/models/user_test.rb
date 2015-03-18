@@ -11,4 +11,11 @@ class UserTest < ActiveSupport::TestCase
     u.save
     refute_nil u.token
   end
+
+  it "regens auth token when asked" do
+    u = User.create(user_params)
+    token = u.token
+    u.regenerate_auth_token!
+    assert_not_equal token, u.reload.token
+  end
 end

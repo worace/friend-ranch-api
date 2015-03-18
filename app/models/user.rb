@@ -11,4 +11,8 @@ class User < ActiveRecord::Base
     end
     self.token = token
   end
+
+  def regenerate_auth_token!
+    generate_auth_token && save!
+  end
 end

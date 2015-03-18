@@ -26,3 +26,15 @@ end
 def hwia(hash)
   ActiveSupport::HashWithIndifferentAccess.new(hash)
 end
+
+def user_params
+  hwia({email: "test@example.com", password: "pizza", password_confirmation: "pizza", name: "worace"})
+end
+
+def resp_data
+  JSON.parse(response.body)
+end
+
+def login(user)
+  request.env[Api::V1::BaseController::TOKEN_HEADER] = user.token
+end
