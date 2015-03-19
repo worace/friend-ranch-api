@@ -1,4 +1,5 @@
 class Api::V1::SessionsController < Api::V1::BaseController
+  protect_from_forgery :except => :create
   def create
     u = User.find_by(email: params[:email])
     if u && u.authenticate(params[:password])
